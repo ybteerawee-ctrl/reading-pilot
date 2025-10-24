@@ -121,7 +121,7 @@
     <script>
         // --- [สำคัญมาก] ---
         // วาง "URL ของเว็บแอป" ที่คุณคัดลอกมาจากขั้นตอนที่ 2 ลงในเครื่องหมาย ' ' นี้
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwQ2O4WBZFqFf6W4Zc7QbUZMaCjyXgAe3EhCO6JA9ywI4uT_C1oAG8wIQ9RS1WgEP4h/exec';
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw2aFHqYe12L3fqqX6G55EGIeUGipqnymq2qRiq0Km4-8dHM9Lrx5WmMY7sHbteC-pp/exec';
         // ---
 
         const q1Container = document.getElementById('q1-container');
@@ -132,28 +132,51 @@
         const questionNumberSpan = document.getElementById('question-number');
         const warningBox = document.getElementById('warning-message');
 
-        document.getElementById('next-to-q2-btn').addEventListener('click', function() {
-            if (validateQ1()) {
-                warningBox.classList.add('hidden');
-                q1Container.classList.add('hidden');
-                q2Container.classList.remove('hidden');
-                // questionNumberSpan.textContent = '2'; // (ซ่อนไว้เพราะมองไม่เห็นแล้ว)
-                window.scrollTo(0, 0); 
-            } else {
-                showWarning('กรุณาตอบคำถามให้ครบทุกข้อในตาราง');
-            }
-        });
+// --- [แก้ไข] เปลี่ยนมาใช้ 'fetch' แบบมาตรฐาน (JSON) ---
+document.getElementById('info-form').addEventListener('submit', function(e) {
+    e.preventDefault();
 
-        document.getElementById('next-to-info-btn').addEventListener('click', function() {
-            if (validateQ2()) {
-                warningBox.classList.add('hidden');
-                mainContent.classList.add('hidden');
-                infoSection.classList.remove('hidden');
-                window.scrollTo(0, 0);
-            } else {
-                showWarning('กรุณาพิมพ์คำตอบในช่องว่าง');
-            }
-        });
+    const submitButton = document.getElementById('submit-btn');
+    submitButton.disabled = true;
+    submitButton.textContent = 'กำลังบันทึกข้อมูล...';
+
+    const formData = {
+        name: document.getElementById('firstName').value,
+        surname: document.getElementById('lastName').value,
+        class: document.getElementById('grade').value,
+        major: document.getElementById('major').value || 'ไม่มี',
+        q1: document.querySelector('input[name="q1_row_1"]:checked').value,
+        q2: document.querySelector('input[name="q1_row_2"]:checked').value,
+        q3: document.querySelector('input[name="q1_row_3"]:checked').value,
+        q4: document.querySelector('input[name="q1_row_4"]:checked').value,
+        q5: document.getElementById('q2_answer').value
+    };
+
+    // ใช้ 'fetch' เพื่อส่งข้อมูลไปยัง URL ของ Web App
+    // ลบ 'mode: no-cors' ออก
+    // เพิ่ม 'headers'
+    fetch(WEB_APP_URL, { // ตรวจสอบว่าตัวแปร WEB_APP_URL ของคุณยังอยู่ครบถ้วน
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json()) // รอคำตอบจาก Code.gs
+    .then(data => {
+        if (data.status === 'success') {
+            // ถ้า Code.gs ตอบว่า "success"
+            showCompletionPage(); 
+        } else {
+            // ถ้า Code.gs ตอบว่า "error"
+            showSubmitError(new Error(data.message || 'Unknown server error'));
+        }
+    })
+    .catch(error => {
+        // ถ้าเกิดข้อผิดพลาด (เช่น เน็ตตัด)
+        showSubmitError(error);
+    });
+});
 
         // --- [แก้ไข] เปลี่ยนมาใช้ 'fetch' แทน 'google.script.run' ---
         document.getElementById('info-form').addEventListener('submit', function(e) {
