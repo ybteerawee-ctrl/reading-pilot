@@ -121,7 +121,7 @@
     <script>
         // --- [สำคัญมาก] ---
         // URL ของ Web App (ของคุณถูกต้องแล้ว)
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw2aFHqYe12L3fqqX6G55EGIeUGipqnymq2qRiq0Km4-8dHM9Lrx5WmMY7sHbteC-pp/exec';
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxA5BHHu78MJ_nQUKbmgfmjP7vfIydBrUk7-hSA-JhWzSus05CHWMRyvEPYNsA4pk-4/exec';
         // ---
 
         // --- 1. ตัวแปรและ Element ที่ใช้บ่อย ---
@@ -161,47 +161,57 @@
         });
 
         // --- 4. [แก้ไข] ปุ่มส่งข้อมูล (เหลืออันเดียวที่ถูกต้อง) ---
-        document.getElementById('info-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const submitButton = document.getElementById('submit-btn');
-            submitButton.disabled = true;
-            submitButton.textContent = 'กำลังบันทึกข้อมูล...';
+        // --- [แก้ไข] ใช้ 'fetch' แบบมาตรฐาน (JSON) ---
+document.getElementById('info-form').addEventListener('submit', function(e) {
+    e.preventDefault();
 
-            const formData = {
-                name: document.getElementById('firstName').value,
-                surname: document.getElementById('lastName').value,
-                class: document.getElementById('grade').value,
-                major: document.getElementById('major').value || 'ไม่มี',
-                q1: document.querySelector('input[name="q1_row_1"]:checked').value,
-                q2: document.querySelector('input[name="q1_row_2"]:checked').value,
-                q3: document.querySelector('input[name="q1_row_3"]:checked').value,
-                q4: document.querySelector('input[name="q1_row_4"]:checked').value,
-                q5: document.getElementById('q2_answer').value
-            };
+    const submitButton = document.getElementById('submit-btn');
+    submitButton.disabled = true;
+    submitButton.textContent = 'กำลังบันทึกข้อมูล...';
 
-            fetch(WEB_APP_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData)
-            })
-            .then(response => response.json()) // รอคำตอบจาก Code.gs
-            .then(data => {
-                if (data.status === 'success') {
-                    // ถ้า Code.gs ตอบว่า "success"
-                    showCompletionPage(); 
-                } else {
-                    // ถ้า Code.gs ตอบว่า "error"
-                    showSubmitError(new Error(data.message || 'Unknown server error'));
-                }
-            })
-            .catch(error => {
-                // ถ้าเกิดข้อผิดพลาด (เช่น เน็ตตัด หรือ CORS ผิด)
-                showSubmitError(error);
-            });
-        });
+    // ตรวจสอบว่า WEB_APP_URL ถูกตั้งค่าแล้ว
+    if (WEB_APP_URL === 'YOUR_WEB_APP_URL_HERE' || !WEB_APP_URL) {
+        alert('ข้อผิดพลาด: WEB_APP_URL ไม่ได้ถูกตั้งค่าในไฟล์ index.html');
+        submitButton.disabled = false;
+        submitButton.textContent = 'ส่งข้อมูล';
+        return;
+    }
+
+    const formData = {
+        name: document.getElementById('firstName').value,
+        surname: document.getElementById('lastName').value,
+        class: document.getElementById('grade').value,
+        major: document.getElementById('major').value || 'ไม่มี',
+        q1: document.querySelector('input[name="q1_row_1"]:checked').value,
+        q2: document.querySelector('input[name="q1_row_2"]:checked').value,
+        q3: document.querySelector('input[name="q1_row_3"]:checked').value,
+        q4: document.querySelector('input[name="q1_row_4"]:checked').value,
+        q5: document.getElementById('q2_answer').value
+    };
+
+    // นี่คือ Fetch ที่ถูกต้อง
+    fetch(WEB_APP_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json()) // รอคำตอบจาก Code.gs
+    .then(data => {
+        if (data.status === 'success') {
+            // ถ้า Code.gs ตอบว่า "success"
+            showCompletionPage(); 
+        } else {
+            // ถ้า Code.gs ตอบว่า "error"
+            showSubmitError(new Error(data.message || 'Unknown server error'));
+        }
+    })
+    .catch(error => {
+        // ถ้าเกิดข้อผิดพลาด (เช่น เน็ตตัด หรือ CORS ผิด)
+        showSubmitError(error);
+    });
+});
 
         // --- 5. [ที่หายไป] ฟังก์ชันช่วยเหลือ ---
         function validateQ1() {
