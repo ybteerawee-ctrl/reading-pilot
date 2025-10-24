@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบทดสอบการอ่าน</title>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://script.google.com https://drive.google.com https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; frame-src 'self' https://drive.google.com;">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* (CSS ทั้งหมดเหมือนเดิม ไม่ต้องแก้ไข) */
@@ -61,7 +60,8 @@
                 <div id="warning-message" class="hidden"></div>
                 <div id="q1-container">
                     <h2 class="question-title">คำถามที่ 1</h2>
-                    <h3 class="question-text">ตารางข้างล่างแสดงรายการผลกระทบที่อาจเกิดขึ้นได้จากกระแสนิยมในแฟชั่นที่รวดเร็ว ผลกระทบที่อาจเกิดขึ้นได้ตามรายการข้างล่างขัดแย้งกับหลักการของการผลิตเสื้อผ้าตามหลักจริยธรรมข้อใดข้อหนึ่งใช่หรือไม่
+                    <h3 class="question-text">ตารางข้างล่างแสดงรายการผลกระทบที่อาจเกิดขึ้นได้จากกระแสนิยมในแฟชั่นที่รวดเร็ว ผลกระทบ
+ที่อาจเกิดขึ้นได้ตามรายการข้างล่างขัดแย้งกับหลักการของการผลิตเสื้อผ้าตามหลักจริยธรรมข้อใดข้อหนึ่งใช่หรือไม่
 </h3>
                     <p class="instruction-text">จงเลือกในช่องใช่ หรือ ไม่ใช่ </p>
                     <form id="q1-form">
@@ -121,36 +121,31 @@
 
     <script>
         // --- [สำคัญมาก] ---
-        // URL ของ Web App (ของคุณถูกต้องแล้ว)
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyrNsQo5jMLj98rc5NOTHzn4hYtXKejA_jmpVBFK2DA-cEnOoRt8l2raMROJ2_esPuz/exec';
+        // วาง "URL ของเว็บแอป" ที่คุณคัดลอกมาจากขั้นตอนที่ 2 ลงในเครื่องหมาย ' ' นี้
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwQ2O4WBZFqFf6W4Zc7QbUZMaCjyXgAe3EhCO6JA9ywI4uT_C1oAG8wIQ9RS1WgEP4h/exec';
         // ---
 
-        // --- 1. ตัวแปรและ Element ที่ใช้บ่อย ---
         const q1Container = document.getElementById('q1-container');
         const q2Container = document.getElementById('q2-container');
         const mainContent = document.getElementById('main-content');
         const infoSection = document.getElementById('personal-info-section');
         const completionScreen = document.getElementById('completion-screen');
-        const questionNumberSpan = document.getElementById('question-number'); // (ตัวแปรนี้อาจไม่ได้ใช้แล้ว แต่เก็บไว้ได้)
+        const questionNumberSpan = document.getElementById('question-number');
         const warningBox = document.getElementById('warning-message');
 
-        // --- 2. [ที่หายไป] ปุ่มไปข้อ 2 ---
         document.getElementById('next-to-q2-btn').addEventListener('click', function() {
-            // ตรวจสอบว่าตอบข้อ 1 ครบหรือยัง
             if (validateQ1()) {
                 warningBox.classList.add('hidden');
                 q1Container.classList.add('hidden');
                 q2Container.classList.remove('hidden');
                 // questionNumberSpan.textContent = '2'; // (ซ่อนไว้เพราะมองไม่เห็นแล้ว)
-                window.scrollTo(0, 0); // เลื่อนขึ้นบน
+                window.scrollTo(0, 0); 
             } else {
                 showWarning('กรุณาตอบคำถามให้ครบทุกข้อในตาราง');
             }
         });
 
-        // --- 3. [ที่หายไป] ปุ่มไปหน้ากรอกข้อมูล ---
         document.getElementById('next-to-info-btn').addEventListener('click', function() {
-            // ตรวจสอบว่าตอบข้อ 2 หรือยัง
             if (validateQ2()) {
                 warningBox.classList.add('hidden');
                 mainContent.classList.add('hidden');
@@ -161,60 +156,47 @@
             }
         });
 
-        // --- 4. [แก้ไข] ปุ่มส่งข้อมูล (เหลืออันเดียวที่ถูกต้อง) ---
-        // --- [แก้ไข] ใช้ 'fetch' แบบมาตรฐาน (JSON) ---
-document.getElementById('info-form').addEventListener('submit', function(e) {
-    e.preventDefault();
+        // --- [แก้ไข] เปลี่ยนมาใช้ 'fetch' แทน 'google.script.run' ---
+        document.getElementById('info-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitButton = document.getElementById('submit-btn');
+            submitButton.disabled = true;
+            submitButton.textContent = 'กำลังบันทึกข้อมูล...';
 
-    const submitButton = document.getElementById('submit-btn');
-    submitButton.disabled = true;
-    submitButton.textContent = 'กำลังบันทึกข้อมูล...';
+            const formData = {
+                name: document.getElementById('firstName').value,
+                surname: document.getElementById('lastName').value,
+                class: document.getElementById('grade').value,
+                major: document.getElementById('major').value || 'ไม่มี',
+                q1: document.querySelector('input[name="q1_row_1"]:checked').value,
+                q2: document.querySelector('input[name="q1_row_2"]:checked').value,
+                q3: document.querySelector('input[name="q1_row_3"]:checked').value,
+                q4: document.querySelector('input[name="q1_row_4"]:checked').value,
+                q5: document.getElementById('q2_answer').value
+            };
 
-    // ตรวจสอบว่า WEB_APP_URL ถูกตั้งค่าแล้ว
-    if (WEB_APP_URL === 'https://script.google.com/macros/s/AKfycbyrNsQo5jMLj98rc5NOTHzn4hYtXKejA_jmpVBFK2DA-cEnOoRt8l2raMROJ2_esPuz/exec' || !WEB_APP_URL) {
-        alert('ข้อผิดพลาด: WEB_APP_URL ไม่ได้ถูกตั้งค่าในไฟล์ index.html');
-        submitButton.disabled = false;
-        submitButton.textContent = 'ส่งข้อมูล';
-        return;
-    }
-    
-    const formData = {
-        name: document.getElementById('firstName').value,
-        surname: document.getElementById('lastName').value,
-        class: document.getElementById('grade').value,
-        major: document.getElementById('major').value || 'ไม่มี',
-        q1: document.querySelector('input[name="q1_row_1"]:checked').value,
-        q2: document.querySelector('input[name="q1_row_2"]:checked').value,
-        q3: document.querySelector('input[name="q1_row_3"]:checked').value,
-        q4: document.querySelector('input[name="q1_row_4"]:checked').value,
-        q5: document.getElementById('q2_answer').value
-    };
+            // ใช้ 'fetch' เพื่อส่งข้อมูลไปยัง URL ของ Web App
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors', // 'no-cors' เหมาะสำหรับการส่งข้อมูลแบบ "fire-and-forget"
+                cache: 'no-cache',
+                redirect: 'follow',
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                // 'no-cors' มักจะไม่ให้เราอ่าน response แต่การส่งสำเร็จก็เพียงพอแล้ว
+                showCompletionPage(); 
+            })
+            .catch(error => {
+                showSubmitError(error);
+            });
+            
+            // หมายเหตุ: เนื่องจากเราใช้ 'no-cors' มันจะไปต่อทันที
+            // เราจึงแสดงหน้า Completion ทันทีที่กดส่ง (ซึ่งเป็นพฤติกรรมที่ยอมรับได้)
+            showCompletionPage();
+        });
 
-    // นี่คือ Fetch ที่ถูกต้อง
-    fetch(WEB_APP_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(response => response.json()) // รอคำตอบจาก Code.gs
-    .then(data => {
-        if (data.status === 'success') {
-            // ถ้า Code.gs ตอบว่า "success"
-            showCompletionPage(); 
-        } else {
-            // ถ้า Code.gs ตอบว่า "error"
-            showSubmitError(new Error(data.message || 'Unknown server error'));
-        }
-    })
-    .catch(error => {
-        // ถ้าเกิดข้อผิดพลาด (เช่น เน็ตตัด หรือ CORS ผิด)
-        showSubmitError(error);
-    });
-});
-
-        // --- 5. [ที่หายไป] ฟังก์ชันช่วยเหลือ ---
         function validateQ1() {
             return document.querySelector('input[name="q1_row_1"]:checked') &&
                    document.querySelector('input[name="q1_row_2"]:checked') &&
@@ -224,19 +206,12 @@ document.getElementById('info-form').addEventListener('submit', function(e) {
 
         function validateQ2() { return document.getElementById('q2_answer').value.trim() !== ''; }
         function showWarning(message) { warningBox.textContent = message; warningBox.classList.remove('hidden'); window.scrollTo(0, 0); }
-        function showCompletionPage() { 
-            mainContent.classList.add('hidden'); // ซ่อน main content ด้วย
-            infoSection.classList.add('hidden'); 
-            completionScreen.classList.remove('hidden'); 
-        }
-        function showSubmitError(error) { 
-            alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + error.message); 
-            document.getElementById('submit-btn').disabled = false; 
-            document.getElementById('submit-btn').textContent = 'ส่งข้อมูล'; 
-        }
+        function showCompletionPage() { infoSection.classList.add('hidden'); completionScreen.classList.remove('hidden'); }
+        function showSubmitError(error) { alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + error.message); document.getElementById('submit-btn').disabled = false; document.getElementById('submit-btn').textContent = 'ส่งข้อมูล'; }
 
         function restartTest() {
-            // รีโหลดหน้าเว็บ
+            // เราไม่สามารถรีสตาร์ทแบบเดิมได้ เพราะเว็บนี้อยู่บน GitHub
+            // วิธีที่ดีที่สุดคือการ reload หน้าเว็บ
             window.location.reload();
         }
     </script>
