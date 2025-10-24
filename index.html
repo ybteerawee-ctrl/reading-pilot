@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบทดสอบการอ่าน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* (CSS ทั้งหมดเหมือนเดิม ไม่ต้องแก้ไข) */
+        body { font-family: 'Sarabun', sans-serif; background-color: #f7fafc; margin: 0; padding: 1rem; }
+        .container { max-width: 1200px; margin: auto; }
+        .header { text-align: center; margin-bottom: 2rem; }
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .card { background-color: #ffffff; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 1.5rem; overflow-y: auto; }
+        .pdf-container { width: 100%; height: 70vh; min-height: 500px; }
+        .pdf-iframe { width: 100%; height: 100%; border: 1px solid #e2e8f0; }
+        .question-title { font-size: 1.5rem; font-weight: 700; border-bottom: 2px solid #fed7aa; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+        .question-text { font-size: 1.125rem; font-weight: 700; margin-bottom: 1rem; white-space: pre-line; }
+        .instruction-text { margin-bottom: 1rem; }
+        .hidden { display: none; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        table th, table td { border: 1px solid #e2e8f0; padding: 0.75rem; vertical-align: middle; text-align: left; }
+        table th { background-color: #f7fafc; }
+        table td:first-child, table th:first-child { text-align: center; width: 5%; }
+        table td:nth-child(3), table th:nth-child(3) { text-align: center; width: 10%; }
+        table td:nth-child(4), table th:nth-child(4) { text-align: center; width: 10%; }
+        textarea, input[type="text"] { width: 100%; box-sizing: border-box; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-size: 1rem; font-family: 'Sarabun', sans-serif; }
+        textarea { height: 150px; }
+        label { display: block; font-weight: 700; margin-bottom: 0.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        .btn { width: 100%; background-color: #3182ce; color: white; font-weight: 700; padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; font-size: 1rem; cursor: pointer; margin-top: 1rem; }
+        .btn:hover { background-color: #2b6cb0; }
+        .btn-orange { background-color: #dd6b20; }
+        .btn-orange:hover { background-color: #c05621; }
+        .btn:disabled { background-color: #a0aec0; cursor: not-allowed; }
+        #warning-message { background-color: #fed7d7; border: 1px solid #f56565; color: #c53030; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; }
+        @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <header class="header">
+            <h1 style="font-size: 2rem; font-weight: 700; color: #2c5282;">📊 ระบบทดสอบการอ่าน</h1>
+            <p style="color: #2b6cb0;">อ่านบทความด้านซ้าย แล้วตอบคำถามด้านขวา</p>
+        </header>
+
+        <main class="main-grid" id="main-content">
+            <section class="card">
+                <h2 class="question-title" style="border-color: #bee3f8;">บทอ่าน</h2>
+                <div class="pdf-container"> 
+                    <iframe 
+                        src="https://drive.google.com/file/d/1wm6IxT3ta44boBQ1qbdpGUIwQ98gajMm/preview" 
+                        class="pdf-iframe" 
+                        frameborder="0">
+                    </iframe>
+                </div>
+            </section>
+            <section class="card">
+                <div id="warning-message" class="hidden"></div>
+                <div id="q1-container">
+                    <h2 class="question-title">คำถามที่ 1</h2>
+                    <h3 class="question-text">ตารางข้างล่างแสดงรายการผลกระทบที่อาจเกิดขึ้นได้...</h3>
+                    <p class="instruction-text">ทำเครื่องหมาย ✓ ในช่อง ใช่ หรือ ไม่ใช่...</p>
+                    <form id="q1-form">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td>1</td> <td>เสื้อผ้าถูกทิ้งในที่ทิ้งขยะมากขึ้น</td>
+                                    <td><input type="radio" name="q1_row_1" value="yes" required></td> <td><input type="radio" name="q1_row_1" value="no"></td>
+                                </tr>
+                                <tr>
+                                    <td>2</td> <td>เสื้อผ้าถูกบริจาคเพื่อการกุศลมากขึ้น</td>
+                                    <td><input type="radio" name="q1_row_2" value="yes" required></td> <td><input type="radio" name="q1_row_2" value="no"></td>
+                                </tr>
+                                <tr>
+                                    <td>3</td> <td>กระแสนิยมใหม่ๆ ทำให้คนงานต้องเรียนรู้...</td>
+                                    <td><input type="radio" name="q1_row_3" value="yes" required></td> <td><input type="radio" name="q1_row_3" value="no"></td>
+                                </tr>
+                                <tr>
+                                    <td>4</td> <td>อัตราค่าจ้างรายชั่วโมงยังคงอยู่ในระดับต่ำ...</td>
+                                    <td><input type="radio" name="q1_row_4" value="yes" required></td> <td><input type="radio" name="q1_row_4" value="no"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button type="button" id="next-to-q2-btn" class="btn">ถัดไป (คำถามข้อ 2)</button>
+                    </form>
+                </div>
+                <div id="q2-container" class="hidden">
+                    <h2 class="question-title">คำถามที่ 2</h2>
+                    <h3 class="question-text">ข้อมูลบางส่วนจากการสำรวจโดยหน่วยงานแห่งหนึ่ง...
+...
+คุณคิดว่าเพราะเหตุใดคนส่วนใหญ่จึงเลือกที่จะบริจาคเงิน</h3>
+                    <form id="q2-form">
+                        <textarea id="q2_answer" name="q2_answer" placeholder="พิมพ์คำตอบของคุณที่นี่..."></textarea>
+                        <button type="button" id="next-to-info-btn" class="btn">ถัดไป (กรอกข้อมูล)</button>
+                    </form>
+                </div>
+            </section>
+        </main>
+        <div id="personal-info-section" class="card hidden" style="max-width: 600px; margin: 2rem auto;">
+            <h2 class="question-title">กรอกข้อมูลส่วนตัว</h2>
+            <form id="info-form">
+                <div id="info-warning-message" class="hidden"></div>
+                <div class="form-group"> <label for="firstName">ชื่อ</label> <input type="text" id="firstName" name="firstName" required> </div>
+                <div class="form-group"> <label for="lastName">นามสกุล</label> <input type="text" id="lastName" name="lastName" required> </div>
+                <div class="form-group"> <label for="grade">ระดับชั้น</label> <input type="text" id="grade" name="grade" placeholder="เช่น ม.4" required> </div>
+                <div class="form-group"> <label for="major">วิชาเอก (ถ้ามี)</label> <input type="text" id="major" name="major" placeholder="เช่น วิทยาศาสตร์"> </div>
+                <button type="submit" id="submit-btn" class="btn btn-orange">ส่งข้อมูล</button>
+            </form>
+        </div>
+        <div id="completion-screen" class="card hidden" style="max-width: 600px; margin: 2rem auto; text-align: center;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">✅</div>
+            <h2 class="question-title" style="border: none;">สิ้นสุดการทดสอบ</h2>
+            <p style="font-size: 1.125rem; margin-bottom: 2rem;">ระบบได้บันทึกข้อมูลของคุณเรียบร้อยแล้ว ขอบคุณครับ</p>
+            <button onclick="restartTest()" class="btn btn-orange">กลับไปหน้าแรก</button>
+        </div>
+    </div>
+
+    <script>
+        // --- [สำคัญมาก] ---
+        // วาง "URL ของเว็บแอป" ที่คุณคัดลอกมาจากขั้นตอนที่ 2 ลงในเครื่องหมาย ' ' นี้
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwQ2O4WBZFqFf6W4Zc7QbUZMaCjyXgAe3EhCO6JA9ywI4uT_C1oAG8wIQ9RS1WgEP4h/exec';
+        // ---
+
+        const q1Container = document.getElementById('q1-container');
+        const q2Container = document.getElementById('q2-container');
+        const mainContent = document.getElementById('main-content');
+        const infoSection = document.getElementById('personal-info-section');
+        const completionScreen = document.getElementById('completion-screen');
+        const questionNumberSpan = document.getElementById('question-number');
+        const warningBox = document.getElementById('warning-message');
+
+        document.getElementById('next-to-q2-btn').addEventListener('click', function() {
+            if (validateQ1()) {
+                warningBox.classList.add('hidden');
+                q1Container.classList.add('hidden');
+                q2Container.classList.remove('hidden');
+                // questionNumberSpan.textContent = '2'; // (ซ่อนไว้เพราะมองไม่เห็นแล้ว)
+                window.scrollTo(0, 0); 
+            } else {
+                showWarning('กรุณาตอบคำถามให้ครบทุกข้อในตาราง');
+            }
+        });
+
+        document.getElementById('next-to-info-btn').addEventListener('click', function() {
+            if (validateQ2()) {
+                warningBox.classList.add('hidden');
+                mainContent.classList.add('hidden');
+                infoSection.classList.remove('hidden');
+                window.scrollTo(0, 0);
+            } else {
+                showWarning('กรุณาพิมพ์คำตอบในช่องว่าง');
+            }
+        });
+
+        // --- [แก้ไข] เปลี่ยนมาใช้ 'fetch' แทน 'google.script.run' ---
+        document.getElementById('info-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitButton = document.getElementById('submit-btn');
+            submitButton.disabled = true;
+            submitButton.textContent = 'กำลังบันทึกข้อมูล...';
+
+            const formData = {
+                name: document.getElementById('firstName').value,
+                surname: document.getElementById('lastName').value,
+                class: document.getElementById('grade').value,
+                major: document.getElementById('major').value || 'ไม่มี',
+                q1: document.querySelector('input[name="q1_row_1"]:checked').value,
+                q2: document.querySelector('input[name="q1_row_2"]:checked').value,
+                q3: document.querySelector('input[name="q1_row_3"]:checked').value,
+                q4: document.querySelector('input[name="q1_row_4"]:checked').value,
+                q5: document.getElementById('q2_answer').value
+            };
+
+            // ใช้ 'fetch' เพื่อส่งข้อมูลไปยัง URL ของ Web App
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors', // 'no-cors' เหมาะสำหรับการส่งข้อมูลแบบ "fire-and-forget"
+                cache: 'no-cache',
+                redirect: 'follow',
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                // 'no-cors' มักจะไม่ให้เราอ่าน response แต่การส่งสำเร็จก็เพียงพอแล้ว
+                showCompletionPage(); 
+            })
+            .catch(error => {
+                showSubmitError(error);
+            });
+            
+            // หมายเหตุ: เนื่องจากเราใช้ 'no-cors' มันจะไปต่อทันที
+            // เราจึงแสดงหน้า Completion ทันทีที่กดส่ง (ซึ่งเป็นพฤติกรรมที่ยอมรับได้)
+            showCompletionPage();
+        });
+
+        function validateQ1() {
+            return document.querySelector('input[name="q1_row_1"]:checked') &&
+                   document.querySelector('input[name="q1_row_2"]:checked') &&
+                   document.querySelector('input[name="q1_row_3"]:checked') &&
+                   document.querySelector('input[name="q1_row_4"]:checked');
+        }
+
+        function validateQ2() { return document.getElementById('q2_answer').value.trim() !== ''; }
+        function showWarning(message) { warningBox.textContent = message; warningBox.classList.remove('hidden'); window.scrollTo(0, 0); }
+        function showCompletionPage() { infoSection.classList.add('hidden'); completionScreen.classList.remove('hidden'); }
+        function showSubmitError(error) { alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + error.message); document.getElementById('submit-btn').disabled = false; document.getElementById('submit-btn').textContent = 'ส่งข้อมูล'; }
+
+        function restartTest() {
+            // เราไม่สามารถรีสตาร์ทแบบเดิมได้ เพราะเว็บนี้อยู่บน GitHub
+            // วิธีที่ดีที่สุดคือการ reload หน้าเว็บ
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
